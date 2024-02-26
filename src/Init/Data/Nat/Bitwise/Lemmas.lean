@@ -273,27 +273,19 @@ theorem testBit_two_pow_sub_succ (h₂ : x < 2 ^ n) (i : Nat) :
     testBit (2^n - (x + 1)) i = (decide (i < n) && ! testBit x i) := by
   induction i generalizing n x with
   | zero =>
-    simp only [testBit_zero, zero_eq, Bool.and_eq_true, decide_eq_true_eq,
-      Bool.not_eq_true']
     match n with
     | 0 => simp
     | n+1 =>
-      -- just logic + omega:
-      simp only [zero_lt_succ, decide_True, Bool.true_and]
-      rw [Nat.pow_succ', ← decide_not, decide_eq_decide]
-      rw [Nat.pow_succ'] at h₂
-      omega
+      by_cases h : (x % 2 = 1) <;> (simp [h] ; omega)
   | succ i ih =>
     simp only [testBit_succ]
     match n with
     | 0 =>
-      simp only [pow_zero, succ_sub_succ_eq_sub, Nat.zero_sub, Nat.zero_div, zero_testBit]
-      rw [decide_eq_false] <;> simp
+      simp [decide_eq_false]
     | n+1 =>
       rw [Nat.two_pow_succ_sub_succ_div_two, ih]
       · simp [Nat.succ_lt_succ_iff]
-      · rw [Nat.pow_succ'] at h₂
-        omega
+      · omega
 
 @[simp] theorem testBit_two_pow_sub_one (n i : Nat) : testBit (2^n-1) i = decide (i < n) := by
   rw [testBit_two_pow_sub_succ]
